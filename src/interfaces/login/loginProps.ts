@@ -1,0 +1,3 @@
+interface LoginProps {
+    onLoginSuccess: () => void;
+  }
