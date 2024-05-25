@@ -32,7 +32,7 @@ const AddEnanoForm: React.FC<AddEnanoFormProps> = ({}) => {
     try {
       const token = "tu-token-de-autenticacion-aqui";
 
-      const response = await fetch("http://localhost:3000/enanos", {
+      const response = await fetch("http://localhost:80/enanos", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

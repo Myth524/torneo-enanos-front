@@ -74,7 +74,7 @@ const Biography: React.FC<BiographyProps> = ({ enanoData, onBack }) => {
         try {
           const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJhZG1pbiIsImlhdCI6MTcxNjY3MTM2OCwiZXhwIjoxNzE2Njc0OTY4fQ._Wnkst8HwBoD8e1BXxDeloBym5m8P59WFsexNjulmWA";
 
-          const response = await fetch(`http://localhost:3000/enanos/${enanoData._id}`, {
+          const response = await fetch(`http://localhost:80/enanos/${enanoData._id}`, {
             method: 'PATCH',
             headers: {
               'Content-Type': 'application/json',
@@ -125,26 +125,26 @@ const Biography: React.FC<BiographyProps> = ({ enanoData, onBack }) => {
     const fetchData = async () => {
       try {
         const habilidadEspecialResponse = await fetch(
-          `http://localhost:3000/habilidadesEspeciales/${enanoData.habilidadEspecial_id}`
+          `http://localhost:80/habilidadesEspeciales/${enanoData.habilidadEspecial_id}`
         );
         const habilidadEspecialData = await habilidadEspecialResponse.json();
         setHabilidadEspecial(habilidadEspecialData);
 
         const historiaResponse = await fetch(
-          `http://localhost:3000/historias/${enanoData.historia_id}`
+          `http://localhost:80/historias/${enanoData.historia_id}`
         );
         const historiaData = await historiaResponse.json();
         setHistoria(historiaData);
 
         const biografiaResponse = await fetch(
-          `http://localhost:3000/biografias/${enanoData.biografia_id}`
+          `http://localhost:80/biografias/${enanoData.biografia_id}`
         );
         const biografiaData = await biografiaResponse.json();
         setBiografia(biografiaData);
 
         if (enanoData.peleas && enanoData.peleas.length > 0) {
           const peleasData = await Promise.all(enanoData.peleas.map(async (pelea_id) => {
-            const peleaResponse = await fetch(`http://localhost:3000/peleas/${pelea_id}`);
+            const peleaResponse = await fetch(`http://localhost:80/peleas/${pelea_id}`);
             return peleaResponse.json();
           }));
           setPeleas(peleasData);
@@ -152,7 +152,7 @@ const Biography: React.FC<BiographyProps> = ({ enanoData, onBack }) => {
 
         if (enanoData.artesMarciales && enanoData.artesMarciales.length > 0) {
           const artesMarcialesData = await Promise.all(enanoData.artesMarciales.map(async (arte_id) => {
-            const arteResponse = await fetch(`http://localhost:3000/artesMarciales/${arte_id}`);
+            const arteResponse = await fetch(`http://localhost:80/artesMarciales/${arte_id}`);
             return arteResponse.json();
           }));
           setArtesMarciales(artesMarcialesData);

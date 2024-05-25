@@ -15,7 +15,7 @@ const Enanos = () => {
 
   const fetchEnanosData = async () => {
     try {
-      const response = await fetch("http://localhost:3000/enanos");
+      const response = await fetch("http://localhost:80/enanos");
       const jsonData = await response.json();
       setEnanosData(jsonData);
       setLoading(false);
@@ -57,7 +57,7 @@ const Enanos = () => {
     try {
       const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJhZG1pbiIsImlhdCI6MTcxNjY1Njk5MywiZXhwIjoxNzE2NjYwNTkzfQ.i-woOoXZb6zfO4n7QSnBD-OEWT_LydZugxEVjcWGd34";
 
-      const response = await fetch(`http://localhost:3000/enanos/${id}`, {
+      const response = await fetch(`http://localhost:80/enanos/${id}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -143,7 +143,7 @@ const Enanos = () => {
             <button onClick={handleShowAddForm} className="bg-green-500 text-white py-2 px-4 rounded-full hover:bg-green-700">
               Agregar Enano
             </button>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4">
               {enanos}
             </div>
           </div>
