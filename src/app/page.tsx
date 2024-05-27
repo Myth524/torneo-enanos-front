@@ -5,6 +5,7 @@ import Login from "@/components/login/login";
 import Sidebar from "@/components/navigation/sideBar";
 import Topbar from "@/components/navigation/topBar";
 import Enanos from "@/components/enanos/enanos";
+import Fights from "@/components/fights/fights";
 
 const Home: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -17,6 +18,9 @@ const Home: React.FC = () => {
       break;
       default:
       RenderedComponent = Enanos;
+      break;
+    case 'Fights' :
+      RenderedComponent = Fights;
       break;
   }
 

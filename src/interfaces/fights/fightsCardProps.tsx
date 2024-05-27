@@ -1,0 +1,3 @@
+interface FightsCardProps extends FightData {
+
+}

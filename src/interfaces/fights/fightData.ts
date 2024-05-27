@@ -3,7 +3,7 @@ interface FightData {
     perdedor: string;
     motivoVictoria: string;
     //No estoy seguro de los siguientes atributos
-    date: Date;
+    date: string;
     peleadores: string[];
     _id: string;
 }
