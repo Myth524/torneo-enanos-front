@@ -15,7 +15,6 @@ interface EnanoData {
   golpesRecibidos: number;
   artesMarciales?: string[]; 
   peleas?: string[]; 
-  estadistica_id?: string | null; 
   historia_id?: string; 
   habilidadEspecial_id?: string; 
   biografia_id?: string;

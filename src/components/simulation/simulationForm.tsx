@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import Swal from 'sweetalert2';
 import DetailItem from '../detailItems/detailItems';
-import { FaCalendarAlt, FaSkullCrossbones, FaTrophy } from 'react-icons/fa';
+import { FaSkullCrossbones, FaTrophy } from 'react-icons/fa';
 import { GiBoxingGlove } from 'react-icons/gi';
-import { MdOutlineFmdBad } from 'react-icons/md';
-import { IoMdArrowBack } from 'react-icons/io';
 
-const AddFightForm: React.FC<AddFightFormProps> = ({ onBack }) => {
+const SimulationForm = () => {
   const [enanosData, setEnanosData] = useState<EnanoData[]>([]);
   const [selectedFighters, setSelectedFighters] = useState<EnanoData[]>([]);
   const [formData, setFormData] = useState<Partial<FightData>>({
@@ -15,6 +13,10 @@ const AddFightForm: React.FC<AddFightFormProps> = ({ onBack }) => {
     perdedor: "",
     date: "",
     motivoVictoria: "",
+  });
+  const [simulationData, setSimulationData] = useState<Partial<SimulationProps>>({
+    ganador: "",
+    perdedor: "",
   });
 
   const fetchEnanosData = async () => {
@@ -30,13 +32,6 @@ const AddFightForm: React.FC<AddFightFormProps> = ({ onBack }) => {
   useEffect(() => {
     fetchEnanosData();
   }, []);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
 
   const handleFighterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedId = e.target.value;
@@ -67,64 +62,58 @@ const AddFightForm: React.FC<AddFightFormProps> = ({ onBack }) => {
     });
   };
 
-  const handleWinnerChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const winnerId = e.target.value;
-    setFormData({
-      ...formData,
-      ganador: winnerId,
-      perdedor: selectedFighters.find(fighter => fighter._id !== winnerId)?._id || "",
-    });
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     try {
       const token = localStorage.getItem("token");
-
-      const ganador =  selectedFighters.find(fighter => fighter._id !== formData.ganador)?.nombre;
-      const perdedor =  selectedFighters.find(fighter => fighter._id !== formData.perdedor)?.nombre;
-
-      const requestData = {
-        ...formData,
-        ganador: ganador,
-        perdedor: perdedor,
-      };
       
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/peleas`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/simulaciones`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${token}`,
         },
-        
-        body: JSON.stringify(requestData),
+        body: JSON.stringify(formData),
       });
 
       if (response.ok) {
-        const newFight = await response.json();
-        Swal.fire("Exito", "La pelea ha sido agregada", "success");
-        onBack();
+        const newSimulation = await response.json();
+        setSimulationData(newSimulation);
+        setFormData({
+          ...formData,
+          ganador: enanosData.find((enano) => enano._id===newSimulation.ganador)?.nombre,
+          perdedor: enanosData.find((enano) => enano._id===newSimulation.perdedor)?.nombre,
+        });
+        console.log(newSimulation);
+        
       } else {
-        Swal.fire("Error", "Hubo un problema al agregar la pelea", "error");
+        Swal.fire("Error", "Hubo un problema al hacer la simulacion", "error");
       }
     } catch (error) {
-      console.error("Error adding fight: ", error);
-      Swal.fire("Error", "Hubo un problema al agregar la pelea", "error");
+      console.error("Error making simulation: ", error);
+      Swal.fire("Error", "Hubo un problema al hacer la simulacion", "error");
     }
+  };
+
+  const handleReset = () => {
+    setSelectedFighters([]);
+    setFormData({
+      peleadores: [],
+      ganador: "",
+      perdedor: "",
+      date: "",
+      motivoVictoria: "",
+    });
+    setSimulationData({
+      ganador: "",
+      perdedor: "",
+    });
   };
 
   return (
     <div className="flex flex-col items-center bg-teal-950 min-h-screen p-8">
       <form onSubmit={handleSubmit} className="w-full max-w-2xl mx-auto p-6 bg-gray-900 text-white shadow-md rounded-lg relative">
-        <h2 className="text-3xl font-bold mb-6 text-center">Agregar Pelea</h2>
-        <button
-          type="button"
-          onClick={onBack}
-          className="absolute top-6 left-6 text-white bg-teal-500 hover:bg-teal-600 p-2 rounded-full shadow-lg"
-        >
-          <IoMdArrowBack size={24} />
-        </button>
+        <h2 className="text-3xl font-bold mb-6 text-center">Simular Pelea</h2>
         <div className="grid grid-cols-1 gap-6">
           <DetailItem
             icon={<GiBoxingGlove />}
@@ -164,92 +153,41 @@ const AddFightForm: React.FC<AddFightFormProps> = ({ onBack }) => {
               </div>
             }
           />
-          <DetailItem
+        <DetailItem
             icon={<FaTrophy />}
             label="Ganador"
             value={
-              <select
-                name="ganador"
-                className={`bg-gray-700 p-2 rounded text-white w-full mb-2`}
+                <input 
+                className="bg-gray-700 p-2 rounded text-white"
+                placeholder="Ganador"
                 value={formData.ganador}
-                onChange={handleWinnerChange}
-                required
-                disabled={selectedFighters.length !== 2}
-              >
-                <option value="" disabled>
-                  Selecciona el ganador
-                </option>
-                {selectedFighters.map((fighter) => (
-                  <option key={fighter._id} value={fighter._id}>
-                    {fighter.nombre}
-                  </option>
-                ))}
-              </select>
+                readOnly 
+                />
             }
-          />
+            />
           <DetailItem
             icon={<FaSkullCrossbones />}
             label="Perdedor"
             value={
-              <select
-                name="perdedor"
-                className={`bg-gray-700 p-2 rounded text-white w-full mb-2`}
+                <input 
+                className="bg-gray-700 p-2 rounded text-white"
+                placeholder="Perdedor"
                 value={formData.perdedor}
-                required
-                disabled
-              >
-                <option value="" disabled>
-                  Selecciona el perdedor
-                </option>
-                {selectedFighters.map((fighter) => (
-                  <option key={fighter._id} value={fighter._id}>
-                    {fighter.nombre}
-                  </option>
-                ))}
-              </select>
-            }
-          />
-          <DetailItem
-            icon={<MdOutlineFmdBad />}
-            label="Motivo"
-            value={
-              <input
-                type="text"
-                name="motivoVictoria"
-                placeholder="Motivo Victoria"
-                value={formData.motivoVictoria}
-                onChange={handleChange}
-                required
-                className={`bg-gray-700 p-2 rounded ${formData.motivoVictoria === "" ? 'text-gray-500' : 'text-white'} w-full`}
-              />
-            }
-          />
-          <DetailItem
-            icon={<FaCalendarAlt />}
-            label="Fecha"
-            value={
-              <input
-                type="date"
-                name="date"
-                placeholder="Fecha"
-                value={formData.date}
-                onChange={handleChange}
-                required
-                className={`bg-gray-700 p-2 rounded ${formData.date === "" ? 'text-gray-500' : 'text-white'} w-full mb-2`}
-              />
+                readOnly 
+                />
             }
           />
         </div>
         <div className="flex justify-between mt-4">
           <button type="submit" className="bg-cyan-500 text-white py-2 px-4 rounded-full hover:bg-cyan-700">
-            Agregar Pelea
+            Simular
           </button>
           <button
             type="button"
-            onClick={onBack}
-            className="bg-red-500 text-white py-2 px-4 rounded-full hover:bg-red-700"
+            onClick={handleReset}
+            className="bg-amber-500 text-white py-2 px-4 rounded-full hover:bg-amber-700"
           >
-            Cancelar
+            Resetear
           </button>
         </div>
       </form>
@@ -257,4 +195,4 @@ const AddFightForm: React.FC<AddFightFormProps> = ({ onBack }) => {
   );
 };
 
-export default AddFightForm;
+export default SimulationForm;

@@ -12,10 +12,9 @@ const Enanos = () => {
   const [error, setError] = useState<boolean>(false);
   const [showAddForm, setShowAddForm] = useState<boolean>(false); 
 
-
   const fetchEnanosData = async () => {
     try {
-      const response = await fetch("http://localhost:80/enanos");
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/enanos`);
       const jsonData = await response.json();
       setEnanosData(jsonData);
       setLoading(false);
@@ -32,10 +31,13 @@ const Enanos = () => {
 
   const handleVisualizar = (enano: EnanoData) => {
     setSelectedEnano(enano);
+    setShowAddForm(false);
   };
 
   const handleBack = () => {
+    fetchEnanosData();
     setSelectedEnano(null);
+    setShowAddForm(false);
   };
 
   const handleEliminar = async (id: string) => {
@@ -55,9 +57,9 @@ const Enanos = () => {
     }
 
     try {
-      const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJhZG1pbiIsImlhdCI6MTcxNjY1Njk5MywiZXhwIjoxNzE2NjYwNTkzfQ.i-woOoXZb6zfO4n7QSnBD-OEWT_LydZugxEVjcWGd34";
+      const token = localStorage.getItem("token");
 
-      const response = await fetch(`http://localhost:80/enanos/${id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/enanos/${id}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -90,7 +92,8 @@ const Enanos = () => {
   };
 
   const handleShowAddForm = () => {
-    setShowAddForm(true); 
+    setShowAddForm(true);
+    setSelectedEnano(null);
   };
 
   const enanos = enanosData.map((enano) => (
@@ -112,7 +115,6 @@ const Enanos = () => {
         golpesRecibidos={enano.golpesRecibidos}
         artesMarciales={enano.artesMarciales}
         peleas={enano.peleas}
-        estadistica_id={enano.estadistica_id}
         historia_id={enano.historia_id}
         habilidadEspecial_id={enano.habilidadEspecial_id}
         biografia_id={enano.biografia_id}
@@ -123,32 +125,30 @@ const Enanos = () => {
   ));
 
   return (
-    <div className="flex-grow bg-teal-950 ml-64 mt-16">
-      <div className="mx-8 my-8">
-        <h1 className="text-3xl font-bold text-white mb-4">Las aberraciones del planeta</h1>
-        {loading ? (
-          <div className="flex justify-center items-center h-32">
-            <BiLoaderAlt className="animate-spin text-4xl text-teal-400" />
-          </div>
-        ) : error ? (
-          <div className="text-center text-red-500">
-            Error al cargar los datos. Por favor, inténtalo de nuevo más tarde.
-          </div>
-        ) : showAddForm ? ( 
-        <AddEnanoForm onAddEnano={handleShowAddForm} onBack={handleBack}/>
-        ): selectedEnano ? (
-          <Biography enanoData={selectedEnano} onBack={handleBack} />
-        ) : (
-          <div className="mt-8">
-            <button onClick={handleShowAddForm} className="bg-green-500 text-white py-2 px-4 rounded-full hover:bg-green-700">
-              Agregar Enano
-            </button>
-            <div className="grid grid-cols-1 gap-4">
-              {enanos}
-            </div>
-          </div>
-        )}
-      </div>
+    <div className="flex-grow ml-64 mt-16 w-full max-w-8xl mx-auto p-6 bg-teal-950 text-white shadow-md relative">
+      <h1 className="text-3xl font-bold text-white mb-4">Las aberraciones del planeta</h1>
+      {!showAddForm && !selectedEnano && (
+        <button onClick={handleShowAddForm} className="absolute top-6 right-8 text-white bg-teal-500 hover:bg-teal-600 p-2 rounded-full shadow-lg">
+          Agregar Enano
+        </button>
+      )}
+      {loading ? (
+        <div className="flex justify-center items-center h-32">
+          <BiLoaderAlt className="animate-spin text-4xl text-teal-400" />
+        </div>
+      ) : error ? (
+        <div className="text-center text-red-500">
+          Error al cargar los datos. Por favor, inténtalo de nuevo más tarde.
+        </div>
+      ) : showAddForm ? ( 
+        <AddEnanoForm onBack={handleBack} />
+      ) : selectedEnano ? (
+        <Biography enanoData={selectedEnano} onBack={handleBack} />
+      ) : (
+          <div className="w-full max-w-8xl mx-auto top-4 p-6 bg-gray-900 text-white shadow-md rounded-lg relative grid grid-cols-2">
+            {enanos}
+        </div>
+      )}
     </div>
   );
 };

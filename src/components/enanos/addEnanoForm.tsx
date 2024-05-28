@@ -1,9 +1,13 @@
 import React, { useState } from "react";
 import Swal from "sweetalert2";
-import { FaVenusMars, FaRulerVertical, FaWeight, FaMedal, FaHeartbeat, FaFistRaised, FaSortNumericUp, FaHandRock, FaHandPaper, FaHourglass, FaArrowAltCircleUp } from "react-icons/fa";
-import DetailItem from "@/components/detailItems/detailItems"; 
+import {
+  FaVenusMars, FaRulerVertical, FaWeight, FaMedal, FaHeartbeat, FaFistRaised,
+  FaSortNumericUp, FaHandRock, FaHandPaper, FaHourglass, FaArrowAltCircleUp
+} from "react-icons/fa";
+import DetailItem from "@/components/detailItems/detailItems";
+import { IoMdArrowBack } from "react-icons/io";
 
-const AddEnanoForm: React.FC<AddEnanoFormProps> = ({}) => {
+const AddEnanoForm: React.FC<AddEnanoFormProps> = ({ onBack }) => {
   const [formData, setFormData] = useState<Partial<EnanoData>>({
     nombre: "",
     genero: "",
@@ -30,9 +34,9 @@ const AddEnanoForm: React.FC<AddEnanoFormProps> = ({}) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const token = "tu-token-de-autenticacion-aqui";
+      const token = localStorage.getItem("token");
 
-      const response = await fetch("http://localhost:80/enanos", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/enanos`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -44,6 +48,7 @@ const AddEnanoForm: React.FC<AddEnanoFormProps> = ({}) => {
       if (response.ok) {
         const newEnano = await response.json();
         Swal.fire("Éxito", "El enano ha sido agregado", "success");
+        onBack();
       } else {
         Swal.fire("Error", "Hubo un problema al agregar el enano", "error");
       }
@@ -55,9 +60,16 @@ const AddEnanoForm: React.FC<AddEnanoFormProps> = ({}) => {
 
   return (
     <div className="flex flex-col items-center bg-teal-950 min-h-screen p-8">
-      <h1 className="text-3xl font-bold text-white mb-4">Agregar Enano</h1>
-      <form onSubmit={handleSubmit} className="bg-gray-800 p-6 rounded-lg shadow-md w-full max-w-lg">
-        <div className="grid grid-cols-1 gap-6">
+      <form onSubmit={handleSubmit} className="w-full max-w-8xl mx-auto p-6 bg-gray-900 text-white shadow-md rounded-lg relative">
+        <h2 className="text-3xl font-bold mb-6 text-center">Agregar Enano</h2>
+        <button
+          type="button"
+          onClick={onBack}
+          className="absolute top-6 left-6 text-white bg-teal-500 hover:bg-teal-600 p-2 rounded-full shadow-lg"
+        >
+          <IoMdArrowBack size={24} />
+        </button>
+        <div className="grid grid-cols-2 gap-6">
           <DetailItem
             icon={<FaVenusMars />}
             label="Nombre"
@@ -255,10 +267,14 @@ const AddEnanoForm: React.FC<AddEnanoFormProps> = ({}) => {
           />
         </div>
         <div className="flex justify-between mt-4">
-          <button type="submit" className="bg-green-500 text-white py-2 px-4 rounded-full hover:bg-green-700" >
+          <button type="submit" className="bg-cyan-500 text-white py-2 px-4 rounded-full hover:bg-cyan-700">
             Agregar Enano
           </button>
-          <button type="button" className="bg-red-500 text-white py-2 px-4 rounded-full hover:bg-red-700">
+          <button
+            type="button"
+            onClick={onBack}
+            className="bg-red-500 text-white py-2 px-4 rounded-full hover:bg-red-700"
+          >
             Cancelar
           </button>
         </div>
